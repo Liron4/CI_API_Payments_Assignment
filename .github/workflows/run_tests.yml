@@ -1,0 +1,26 @@
+# .github/workflows/run_tests.yml
+name: Run API Tests via Docker
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger for development testing
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build the Docker image
+      run: docker build -t api-tests-image .
+      
+    - name: Run tests
+      run: |
+        docker run \
+          --env API_URL="${{ secrets.API_URL }}" \
+          --env PAGE_CODE="${{ secrets.PAGE_CODE }}" \
+          --env USER_ID="${{ secrets.USER_ID }}" \
+          api-tests-image pytest
